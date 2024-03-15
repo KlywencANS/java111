@@ -1,0 +1,91 @@
+package trzy;
+
+import java.io.BufferedWriter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+abstract class Babelkowe {
+    abstract boolean compare(String str1, String str2);
+
+    void sort(List<String> list) {
+        int n = list.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (compare(list.get(j), list.get(j + 1))) {
+                    Collections.swap(list, j, j + 1);
+                }
+            }
+        }
+    }
+
+    void saveToFile(List<String> list, String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (String str : list) {
+                writer.write(str + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class AlphabeticalBubbleSort extends Babelkowe {
+    @Override
+    boolean compare(String str1, String str2) {
+        if (str1.isEmpty() || str2.isEmpty())
+            return false;
+        return str1.compareTo(str2) > 0;
+    }
+}
+
+class ReverseAlphabeticalBubbleSort extends Babelkowe {
+    @Override
+    boolean compare(String str1, String str2) {
+        if (str1.isEmpty() || str2.isEmpty())
+            return false;
+        return str1.compareTo(str2) < 0;
+    }
+}
+
+class ReverseAlphabeticalBackwardsBubbleSort extends Babelkowe {
+    @Override
+    boolean compare(String str1, String str2) {
+        if (str1.isEmpty() || str2.isEmpty())
+            return false;
+        StringBuilder sb1 = new StringBuilder(str1);
+        StringBuilder sb2 = new StringBuilder(str2);
+        return sb1.reverse().toString().compareTo(sb2.reverse().toString()) > 0;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        String fileName = Main.class.getResource("dane-slowa-10tys.txt").getPath();
+        List<String> list = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            int arraySize = Integer.parseInt(br.readLine());
+
+            for (int i = 0; i < arraySize; i++) {
+                list.add(br.readLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        Babelkowe alphabeticalSort = new AlphabeticalBubbleSort();
+        alphabeticalSort.sort(list);
+        alphabeticalSort.saveToFile(list, "alfabetyczbnie.txt");
+
+        Babelkowe reverseAlphabeticalSort = new ReverseAlphabeticalBubbleSort();
+        reverseAlphabeticalSort.sort(list);
+        reverseAlphabeticalSort.saveToFile(list, "reverse.txt");
+
+        Babelkowe reverseAlphabeticalBackwardsSort = new ReverseAlphabeticalBackwardsBubbleSort();
+        reverseAlphabeticalBackwardsSort.sort(list);
+        reverseAlphabeticalBackwardsSort.saveToFile(list, "atergo.txt");
+    }
+}
